@@ -1,0 +1,8 @@
+dataset
+checkpoint
+__pycache__
+train_log
+.ipynb_checkpoints
+screenlog.*
+*.egg-info
+.neptune

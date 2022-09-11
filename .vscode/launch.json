@@ -1,0 +1,73 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Train - coco_resnext50_swsl_gtn_1234432",
+            "type": "python",
+            "request": "launch",
+            "program": "scripts/wsmol_train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--data-dir", "dataset/COCO",
+                "--metadata-dir", "metadata/COCO",
+                "--dataset", "coco",
+                "--image-size", "448",
+                "--workers", "8", 
+                "--batch-size", "80",
+                "--lr", "0.03",
+                "--learning-rate-decay", "0.1",
+                "--epoch_step", "100",
+                "--embedding", "metadata/COCO/embedding/coco_glove_word2vec_80x300.pkl",
+                "--adj-files",
+                "metadata/COCO/topology/coco_adj.pkl",
+                "metadata/COCO/topology/coco_adj_1_2.pkl",
+                "metadata/COCO/topology/coco_adj_1_3.pkl",
+                "metadata/COCO/topology/coco_adj_1_4.pkl",
+                "metadata/COCO/topology/coco_adj_2_1.pkl",
+                "metadata/COCO/topology/coco_adj_3_1.pkl",
+                "metadata/COCO/topology/coco_adj_4_1.pkl",
+                "-a", "resnext50_32x4d_swsl",
+                "-g", "-gtn",
+                "--device_ids", "0", "1",
+                "-n", "resnext50_swsl_gtn",
+                "--neptune"
+            ]
+        },
+        {
+            "name": "Train - VOC",
+            "type": "python",
+            "request": "launch",
+            "program": "scripts/5_train.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--data-dir", "dataset/VOC",
+                "--metadata-dir", "metadata/VOC",
+                "--dataset", "voc",
+                "--image-size", "448",
+                "--workers", "8", 
+                "--batch-size", "40",
+                "--lr", "0.03",
+                "--learning-rate-decay", "0.1",
+                "--epoch_step", "100",
+                "--embedding", "metadata/VOC/embedding/voc_glove_word2vec.pkl",
+                "--adj-files",
+                "metadata/VOC/topology/voc_adj.pkl",
+                "metadata/VOC/topology/voc_adj_1_2.pkl",
+                "metadata/VOC/topology/voc_adj_1_3.pkl",
+                "metadata/VOC/topology/voc_adj_1_4.pkl",
+                "metadata/VOC/topology/voc_adj_2_1.pkl",
+                "metadata/VOC/topology/voc_adj_3_1.pkl",
+                "metadata/VOC/topology/voc_adj_4_1.pkl",
+                "-a", "resnext50_32x4d_swsl",
+                "-g", "-gtn",
+                "--device_ids", "0", "1",
+                "-n", "resnext50_swsl_gtn"
+            ]
+        }
+    ]
+}

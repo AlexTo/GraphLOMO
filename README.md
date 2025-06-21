@@ -1,12 +1,15 @@
-## GraphCAM: Multiple Object Localisation with Graph Transformer Networks
 
-Locating multiple objects in real-world images has been an important task of computer vision. It typically requires a large number of visual annotations such as bounding boxes or segmentations; nevertheless, the annotation process is labour-intensive and sometimes inextricable for human experts in complex domains such as manufacturing and medical fields. This paper presents a weakly semi-supervised learning framework based on Graph Transformer Networks for Class Activation Maps (CAM) to locate multiple objects in images without visual annotations. Our method overcomes the computational challenges of gradient-based CAM, while integrating topological information into object localisation. Moreover, we investigate into the higher order of object inter-dependencies with the use of 3D adjacency matrix for better performance. Extensive empirical experiments are conducted on MS-COCO and Pascal VOC to establish baselines and a state-of-the-art for weakly semi-supervised multi-object localisation.
+## GraphLOMO: LOcating Multiple Objects Without Visual Annotations <!-- omit in toc -->
 
-## Table of contents
+Locating multiple objects has become an important task in multimedia research and applications due to the common nature of real-world images. Object localization requires a large number of visual annotations, such as bounding boxes or segmentation, but the annotation process is labour-intensive and sometimes inextricable for human experts in complex domains such as manufacturing and medical fields. Moving beyond single object localization, this paper presents a weakly semi-supervised learning framework based on Graph Transformer Networks using Class Activation Maps to LOcate Multiple Objects (GraphLOMO) in images without visual annotations. Our method overcomes the computational challenges of gradient-based CAM while integrating topological information and prior knowledge into object localization. Moreover, we investigate the higher order of object inter-dependencies with the use of 3D adjacency matrix for better performance. Extensive empirical experiments are conducted on MS-COCO and Pascal VOC to establish a suitable performance measure and baselines, as well as a state-of-the-art for weakly semi-supervised multi-object localization.
 
-- [GraphCAM: Multiple Object Localisation with Graph Transformer Networks](#graphcam-multiple-object-localisation-with-graph-transformer-networks)
-- [Table of contents](#table-of-contents)
-- [Code dependencies](#code-dependencies)
+Source code for paper: [GraphLOMO: LOcating Multiple Objects Without Visual Annotations](https://link.springer.com/article/10.1007/s00138-025-01707-7)
+
+![](images/example.png)
+
+## Table of contents <!-- omit in toc -->
+
+- [Installation](#installation)
 - [Training](#training)
 - [Generate score maps](#generate-score-maps)
 - [Evaluate the modified MaxBoxAccV2 for multiple objects](#evaluate-the-modified-maxboxaccv2-for-multiple-objects)
@@ -14,14 +17,14 @@ Locating multiple objects in real-world images has been an important task of com
 - [Evaluate the hit-mAP metric](#evaluate-the-hit-map-metric)
 - [References](#references)
 
-## Code dependencies
+## Installation
 
     pip install -r requirements.txt
     pip install -e . # install this project
 
 ## Training
 
-The training code is provided in `scripts/wsmol_main.py`
+The training code is provided in `scripts/wsmol_train.py`
 
 We provide training commands for the following architectures `vgg`, `efficientnet`, `resnet50`, `resnet101` and `resnext50` in combination with the following CAM methods `Grad-CAM`, `GCN`, `GTN`, `GTN + 3D adjacency matrices (Graph-CAM`).
 

@@ -7,67 +7,95 @@ import torchvision.models as models
 
 
 def load_resnet(model_name, pretrained=True):
-    if model_name == 'resnet18':
+    if model_name == "resnet18":
         return models.resnet18(pretrained=pretrained)
-    if model_name == 'resnet34':
+    if model_name == "resnet34":
         return models.resnet34(pretrained=pretrained)
-    if model_name == 'resnet50':
+    if model_name == "resnet50":
         return models.resnet50(pretrained=pretrained)
-    if model_name == 'resnet101':
+    if model_name == "resnet101":
         return models.resnet101(pretrained=pretrained)
-    if model_name == 'resnet152':
+    if model_name == "resnet152":
         return models.resnet152(pretrained=pretrained)
-    if model_name == 'resnext50_32x4d':
+    if model_name == "resnext50_32x4d":
         return models.resnext50_32x4d(pretrained=pretrained)
-    if model_name == 'resnext101_32x8d':
+    if model_name == "resnext101_32x8d":
         return models.resnext101_32x8d(pretrained=pretrained)
-    if model_name == 'wide_resnet50_2':
+    if model_name == "wide_resnet50_2":
         return models.wide_resnet50_2(pretrained=pretrained)
-    if model_name == 'wide_resnet101_2':
+    if model_name == "wide_resnet101_2":
         return models.wide_resnet101_2(pretrained=pretrained)
-    if model_name == 'resnet18_swsl':
-        return torch.hub.load('facebookresearch/semi-supervised-ImageNet1K-models', 'resnet18_swsl')
-    if model_name == 'resnet50_swsl':
-        return torch.hub.load('facebookresearch/semi-supervised-ImageNet1K-models', 'resnet50_swsl')
-    if model_name == 'resnext50_32x4d_swsl':
-        return torch.hub.load('facebookresearch/semi-supervised-ImageNet1K-models', 'resnext50_32x4d_swsl')
-    if model_name == 'resnext101_32x4d_swsl':
-        return torch.hub.load('facebookresearch/semi-supervised-ImageNet1K-models', 'resnext101_32x4d_swsl')
-    if model_name == 'resnext101_32x8d_swsl':
-        return torch.hub.load('facebookresearch/semi-supervised-ImageNet1K-models', 'resnext101_32x8d_swsl')
-    if model_name == 'resnext101_32x16d_swsl':
-        return torch.hub.load('facebookresearch/semi-supervised-ImageNet1K-models', 'resnext101_32x16d_swsl')
-    if model_name == 'resnet18_ssl':
-        return torch.hub.load('facebookresearch/semi-supervised-ImageNet1K-models', 'resnet18_ssl')
-    if model_name == 'resnet50_ssl':
-        return torch.hub.load('facebookresearch/semi-supervised-ImageNet1K-models', 'resnet50_ssl')
-    if model_name == 'resnext50_32x4d_ssl':
-        return torch.hub.load('facebookresearch/semi-supervised-ImageNet1K-models', 'resnext50_32x4d_ssl')
-    if model_name == 'resnext101_32x4d_ssl':
-        return torch.hub.load('facebookresearch/semi-supervised-ImageNet1K-models', 'resnext101_32x4d_ssl')
-    if model_name == 'resnext101_32x8d_ssl':
-        return torch.hub.load('facebookresearch/semi-supervised-ImageNet1K-models', 'resnext101_32x8d_ssl')
-    if model_name == 'resnext101_32x16d_ssl':
-        return torch.hub.load('facebookresearch/semi-supervised-ImageNet1K-models', 'resnext101_32x16d_ssl')
+    if model_name == "resnet18_swsl":
+        return torch.hub.load(
+            "facebookresearch/semi-supervised-ImageNet1K-models", "resnet18_swsl"
+        )
+    if model_name == "resnet50_swsl":
+        return torch.hub.load(
+            "facebookresearch/semi-supervised-ImageNet1K-models", "resnet50_swsl"
+        )
+    if model_name == "resnext50_32x4d_swsl":
+        return torch.hub.load(
+            "facebookresearch/semi-supervised-ImageNet1K-models", "resnext50_32x4d_swsl"
+        )
+    if model_name == "resnext101_32x4d_swsl":
+        return torch.hub.load(
+            "facebookresearch/semi-supervised-ImageNet1K-models",
+            "resnext101_32x4d_swsl",
+        )
+    if model_name == "resnext101_32x8d_swsl":
+        return torch.hub.load(
+            "facebookresearch/semi-supervised-ImageNet1K-models",
+            "resnext101_32x8d_swsl",
+        )
+    if model_name == "resnext101_32x16d_swsl":
+        return torch.hub.load(
+            "facebookresearch/semi-supervised-ImageNet1K-models",
+            "resnext101_32x16d_swsl",
+        )
+    if model_name == "resnet18_ssl":
+        return torch.hub.load(
+            "facebookresearch/semi-supervised-ImageNet1K-models", "resnet18_ssl"
+        )
+    if model_name == "resnet50_ssl":
+        return torch.hub.load(
+            "facebookresearch/semi-supervised-ImageNet1K-models", "resnet50_ssl"
+        )
+    if model_name == "resnext50_32x4d_ssl":
+        return torch.hub.load(
+            "facebookresearch/semi-supervised-ImageNet1K-models", "resnext50_32x4d_ssl"
+        )
+    if model_name == "resnext101_32x4d_ssl":
+        return torch.hub.load(
+            "facebookresearch/semi-supervised-ImageNet1K-models", "resnext101_32x4d_ssl"
+        )
+    if model_name == "resnext101_32x8d_ssl":
+        return torch.hub.load(
+            "facebookresearch/semi-supervised-ImageNet1K-models", "resnext101_32x8d_ssl"
+        )
+    if model_name == "resnext101_32x16d_ssl":
+        return torch.hub.load(
+            "facebookresearch/semi-supervised-ImageNet1K-models",
+            "resnext101_32x16d_ssl",
+        )
     return None
 
 
 def load_vgg(model_name, pretrained=True):
-    if model_name == 'vgg11':
+    if model_name == "vgg11":
         return models.vgg11(pretrained=pretrained)
-    if model_name == 'vgg11_bn':
+    if model_name == "vgg11_bn":
         return models.vgg11_bn(pretrained=pretrained)
-    if model_name == 'vgg13':
+    if model_name == "vgg13":
         return models.vgg13(pretrained=pretrained)
-    if model_name == 'vgg13_bn':
+    if model_name == "vgg13_bn":
         return models.vgg13_bn(pretrained=pretrained)
-    if model_name == 'vgg16':
+    if model_name == "vgg16":
         return models.vgg16(pretrained=pretrained)
-    if model_name == 'vgg16_bn':
+    if model_name == "vgg16_bn":
         return models.vgg16_bn(pretrained=pretrained)
-    if model_name == 'vgg19':
+    if model_name == "vgg19":
         return models.vgg19(pretrained=pretrained)
-    if model_name == 'vgg19_bn':
+    if model_name == "vgg19_bn":
         return models.vgg19_bn(pretrained=pretrained)
     return None
 
@@ -106,8 +134,11 @@ class Cutout(object):
         y2 = np.clip(y_c + h_cutout // 2, 0, h)
         x1 = np.clip(x_c - w_cutout // 2, 0, w)
         x2 = np.clip(x_c + w_cutout // 2, 0, w)
-        fill_color = (random.randint(0, 255), random.randint(
-            0, 255), random.randint(0, 255))
+        fill_color = (
+            random.randint(0, 255),
+            random.randint(0, 255),
+            random.randint(0, 255),
+        )
         img_draw.rectangle([x1, y1, x2, y2], fill=fill_color)
 
         return x
@@ -122,28 +153,37 @@ class Warp(object):
         return img.resize((self.size, self.size), self.interpolation)
 
     def __str__(self):
-        return self.__class__.__name__ + ' (size={size}, interpolation={interpolation})'.format(size=self.size,
-                                                                                                interpolation=self.interpolation)
+        return (
+            self.__class__.__name__
+            + " (size={size}, interpolation={interpolation})".format(
+                size=self.size, interpolation=self.interpolation
+            )
+        )
 
 
 class MultiScaleCrop(object):
 
-    def __init__(self, input_size, scales=None, max_distort=1, fix_crop=True, more_fix_crop=True):
-        self.scales = scales if scales is not None else [1, 875, .75, .66]
+    def __init__(
+        self, input_size, scales=None, max_distort=1, fix_crop=True, more_fix_crop=True
+    ):
+        self.scales = scales if scales is not None else [1, 875, 0.75, 0.66]
         self.max_distort = max_distort
         self.fix_crop = fix_crop
         self.more_fix_crop = more_fix_crop
-        self.input_size = input_size if not isinstance(input_size, int) else [
-            input_size, input_size]
+        self.input_size = (
+            input_size if not isinstance(input_size, int) else [input_size, input_size]
+        )
         self.interpolation = Image.BILINEAR
 
     def __call__(self, img):
         im_size = img.size
         crop_w, crop_h, offset_w, offset_h = self._sample_crop_size(im_size)
         crop_img_group = img.crop(
-            (offset_w, offset_h, offset_w + crop_w, offset_h + crop_h))
+            (offset_w, offset_h, offset_w + crop_w, offset_h + crop_h)
+        )
         ret_img_group = crop_img_group.resize(
-            (self.input_size[0], self.input_size[1]), self.interpolation)
+            (self.input_size[0], self.input_size[1]), self.interpolation
+        )
         return ret_img_group
 
     def _sample_crop_size(self, im_size):
@@ -152,10 +192,14 @@ class MultiScaleCrop(object):
         # find a crop size
         base_size = min(image_w, image_h)
         crop_sizes = [int(base_size * x) for x in self.scales]
-        crop_h = [self.input_size[1] if abs(
-            x - self.input_size[1]) < 3 else x for x in crop_sizes]
-        crop_w = [self.input_size[0] if abs(
-            x - self.input_size[0]) < 3 else x for x in crop_sizes]
+        crop_h = [
+            self.input_size[1] if abs(x - self.input_size[1]) < 3 else x
+            for x in crop_sizes
+        ]
+        crop_w = [
+            self.input_size[0] if abs(x - self.input_size[0]) < 3 else x
+            for x in crop_sizes
+        ]
 
         pairs = []
         for i, h in enumerate(crop_h):
@@ -169,13 +213,15 @@ class MultiScaleCrop(object):
             h_offset = random.randint(0, image_h - crop_pair[1])
         else:
             w_offset, h_offset = self._sample_fix_offset(
-                image_w, image_h, crop_pair[0], crop_pair[1])
+                image_w, image_h, crop_pair[0], crop_pair[1]
+            )
 
         return crop_pair[0], crop_pair[1], w_offset, h_offset
 
     def _sample_fix_offset(self, image_w, image_h, crop_w, crop_h):
         offsets = self.fill_fix_offset(
-            self.more_fix_crop, image_w, image_h, crop_w, crop_h)
+            self.more_fix_crop, image_w, image_h, crop_w, crop_h
+        )
         return random.choice(offsets)
 
     @staticmethod
@@ -253,23 +299,32 @@ class AveragePrecisionMeter(object):
         if output.ndim == 1:
             output = output.reshape(-1, 1)
         else:
-            assert output.ndim == 2, \
-                'wrong output size (should be 1D or 2D with one column \
-                per class)'
+            assert (
+                output.ndim == 2
+            ), "wrong output size (should be 1D or 2D with one column \
+                per class)"
         if target.ndim == 1:
             target = target.reshape(-1, 1)
         else:
-            assert target.ndim == 2, \
-                'wrong target size (should be 1D or 2D with one column \
-                per class)'
+            assert (
+                target.ndim == 2
+            ), "wrong target size (should be 1D or 2D with one column \
+                per class)"
         if self.scores.size > 0:
-            assert target.shape[1] == self.targets.shape[1], \
-                'dimensions for output should match previously added examples.'
+            assert (
+                target.shape[1] == self.targets.shape[1]
+            ), "dimensions for output should match previously added examples."
 
-        self.scores = np.vstack([self.scores, output.astype(
-            np.float)]) if self.scores.size > 0 else output.astype(np.float)
-        self.targets = np.vstack([self.targets, target.astype(
-            np.int)]) if self.targets.size > 0 else target.astype(np.int)
+        self.scores = (
+            np.vstack([self.scores, output.astype(float)])
+            if self.scores.size > 0
+            else output.astype(float)
+        )
+        self.targets = (
+            np.vstack([self.targets, target.astype(int)])
+            if self.targets.size > 0
+            else target.astype(int)
+        )
 
     def value(self):
         """Returns the model's average precision for each class
@@ -284,7 +339,8 @@ class AveragePrecisionMeter(object):
         for k in range(self.scores.shape[1]):
             # compute average precision
             ap[k] = self.average_precision(
-                self.scores[:, k], self.targets[:, k], self.difficult_examples)
+                self.scores[:, k], self.targets[:, k], self.difficult_examples
+            )
         return ap
 
     def average_precision(self, output, target, difficult_examples=False):
@@ -293,9 +349,9 @@ class AveragePrecisionMeter(object):
         indices = output.argsort()[::-1]
 
         # Computes prec@i
-        pos_count = 0.
-        total_count = 0.
-        precision_at_i = 0.
+        pos_count = 0.0
+        total_count = 0.0
+        precision_at_i = 0.0
         for i in indices:
             label = target[i]
             if difficult_examples and label == 0:
@@ -352,17 +408,20 @@ class AveragePrecisionMeter(object):
 class AdjacencyHelper:
 
     @staticmethod
-    def load_adj(num_classes, t=0.4, adj_files=None, add_identity=False):
-        _adj_stack = torch.eye(num_classes).type(
-            torch.FloatTensor).unsqueeze(-1) if add_identity else torch.Tensor([])
+    def load_adj(num_classes, adj_files, t=0.4, add_identity=False):
+        _adj_stack = (
+            torch.eye(num_classes).type(torch.FloatTensor).unsqueeze(-1)
+            if add_identity
+            else torch.Tensor([])
+        )
 
         for adj_file in adj_files:
-            if '_emb' in adj_file:
+            if "_emb" in adj_file:
                 _adj = AdjacencyHelper.gen_emb_A(adj_file)
             else:
                 _adj = AdjacencyHelper.gen_A(num_classes, adj_file, t)
 
-            _adj = torch.from_numpy(_adj).type(torch.FloatTensor)
+            _adj = torch.from_numpy(_adj).type(torch.float32)
             _adj_stack = torch.cat([_adj_stack, _adj.unsqueeze(-1)], dim=-1)
 
         return _adj_stack.permute(2, 0, 1)
@@ -370,9 +429,10 @@ class AdjacencyHelper:
     @staticmethod
     def gen_A(num_classes, adj_file, t=None):
         import pickle
-        result = pickle.load(open(adj_file, 'rb'))
-        _adj = result['adj']
-        _nums = result['nums']
+
+        result = pickle.load(open(adj_file, "rb"))
+        _adj = result["adj"]
+        _nums = result["nums"]
         _nums = _nums[:, np.newaxis]
         _adj = _adj / (_nums + 1e-6)
 
@@ -386,8 +446,9 @@ class AdjacencyHelper:
     @staticmethod
     def gen_emb_A(adj_file, t=None):
         import pickle
-        result = pickle.load(open(adj_file, 'rb'))
-        _adj = result['adj']
+
+        result = pickle.load(open(adj_file, "rb"))
+        _adj = result["adj"]
         mean_v = _adj.mean()
         std_v = _adj.std()
         t = mean_v - std_v if t is None else t
@@ -418,8 +479,11 @@ class AdjacencyHelper:
         smask_adj[indices] = 0
         mask_adj = torch.reshape(smask_adj, [batch_size, n, n])
         mask_adj_r = torch.rot90(mask_adj, 1, [1, 2])
-        adj = (mask_adj.bool() & mask_adj_r.bool() & torch.logical_not(
-            torch.diag_embed(torch.ones((batch_size, n))).bool())).float()
+        adj = (
+            mask_adj.bool()
+            & mask_adj_r.bool()
+            & torch.logical_not(torch.diag_embed(torch.ones((batch_size, n))).bool())
+        ).float()
         return adj
 
     @staticmethod
@@ -436,8 +500,7 @@ class AdjacencyHelper:
         A.masked_fill_(A < t, 0.0)
         A.masked_fill_(A >= t, 1.0)
         # Normalisation
-        A = torch.div(torch.mul(A, 0.25), torch.add(
-            A.sum(0, keepdim=True), 1e-6))
+        A = torch.div(torch.mul(A, 0.25), torch.add(A.sum(0, keepdim=True), 1e-6))
         # Add identity matrix
         mask = torch.eye(A.shape[0]).bool()
         A.masked_fill_(mask, 1.0)

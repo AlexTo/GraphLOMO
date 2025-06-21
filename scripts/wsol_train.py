@@ -27,10 +27,10 @@ import torch
 import torch.nn as nn
 import torch.optim
 
-from config import get_configs
+from wsmol.config import get_configs
 from data_loaders import get_data_loader
 from inference import CAMComputer
-from util import AveragePrecisionMeter, string_contains_any
+from wsmol.util import AveragePrecisionMeter, string_contains_any
 import wsmol
 import wsmol.methods
 from tqdm import tqdm

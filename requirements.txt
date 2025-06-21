@@ -1,0 +1,11 @@
+tqdm
+pycocotools
+pandas
+opencv-python
+bs4
+neptune
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch
+torchvision
+torchnet
+randaugment

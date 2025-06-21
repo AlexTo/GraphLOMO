@@ -8,8 +8,8 @@ from ._coco_utils import download_coco2014, gen_metadata
 
 
 class COCO2014(data.Dataset):
-    def __init__(self, data_dir="dataset/COCO",
-                 metadata_dir="metadata/COCO",
+    def __init__(self, data_dir="data/coco",
+                 metadata_dir="metadata/coco",
                  transform=None,
                  phase='train',
                  emb_name=None):
@@ -27,7 +27,6 @@ class COCO2014(data.Dataset):
         gen_metadata(data_dir, metadata_dir)
         self.get_anno()
         self.num_classes = len(self.cat2idx)
-
         with open(emb_name, 'rb') as f:
             self.emb = pickle.load(f)
         self.emb_name = emb_name

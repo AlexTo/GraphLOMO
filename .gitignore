@@ -1,4 +1,4 @@
-dataset
+data
 checkpoint
 __pycache__
 train_log
@@ -6,3 +6,4 @@ train_log
 screenlog.*
 *.egg-info
 .neptune
+venv

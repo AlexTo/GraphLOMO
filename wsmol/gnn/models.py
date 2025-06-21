@@ -9,8 +9,11 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.model = model
         self.num_classes = num_classes
-        self.fc = None if model_features is None or model_features == num_classes else nn.Linear(
-            model_features, num_classes)
+        self.fc = (
+            None
+            if model_features is None or model_features == num_classes
+            else nn.Linear(model_features, num_classes)
+        )
 
     def forward(self, img, ext=None):
         """Performs neural network operations.
@@ -26,7 +29,9 @@ class Net(nn.Module):
         x = self.model(img)  # (B, 2048)
         return x if self.fc is None else self.fc(x)
 
-    def get_config_optim(self, lr, lrg, add_weight_decay=False, weight_decay=1e-4, skip_list=()):
+    def get_config_optim(
+        self, lr, lrg, add_weight_decay=False, weight_decay=1e-4, skip_list=()
+    ):
         if add_weight_decay:
             decay = []
             no_decay = []
@@ -38,17 +43,25 @@ class Net(nn.Module):
                 else:
                     decay.append(param)
             return [
-                {'params': no_decay, 'lr': lr, 'weight_decay': 0.},
-                {'params': decay, 'lr': lr, 'weight_decay': weight_decay}
+                {"params": no_decay, "lr": lr, "weight_decay": 0.0},
+                {"params": decay, "lr": lr, "weight_decay": weight_decay},
             ]
 
-        return [
-            {'params': self.model.parameters(), 'lr': lr}
-        ]
+        return [{"params": self.model.parameters(), "lr": lr}]
 
 
 class GraphNet(nn.Module):
-    def __init__(self, model, num_classes, emb_features=300, gc1_features=1024, gc2_features=2048, t=0.4, adj_files=None, gtn=False):
+    def __init__(
+        self,
+        model,
+        num_classes,
+        emb_features=300,
+        gc1_features=1024,
+        gc2_features=2048,
+        t=0.4,
+        adj_files=None,
+        gtn=False,
+    ):
         super(GraphNet, self).__init__()
         self.model = model
         self.num_classes = num_classes
@@ -57,8 +70,11 @@ class GraphNet(nn.Module):
         self.gc2 = GConv(gc1_features, gc2_features)
         self.relu = nn.LeakyReLU(0.2)
 
-        self.A = nn.Parameter(AdjacencyHelper.load_adj(
-            num_classes, t=t, adj_files=adj_files, add_identity=gtn).unsqueeze(0))
+        self.A = nn.Parameter(
+            AdjacencyHelper.load_adj(
+                num_classes, adj_files=adj_files, t=t, add_identity=gtn
+            ).unsqueeze(0)
+        )
         self.gt = GTLayer(self.A.shape[1], 1, first=True) if gtn else None
 
     def forward(self, img, emb):
@@ -116,7 +132,9 @@ class GraphNet(nn.Module):
         y = torch.matmul(x, w)  # (B, num_classes)
         return y  # (B, num_classes)
 
-    def get_config_optim(self, lr, lrg, add_weight_decay=False, weight_decay=1e-4, skip_list=()):
+    def get_config_optim(
+        self, lr, lrg, add_weight_decay=False, weight_decay=1e-4, skip_list=()
+    ):
         if add_weight_decay:
             decay = []
             no_decay = []
@@ -128,20 +146,22 @@ class GraphNet(nn.Module):
                 else:
                     decay.append(param)
             return [
-                {'params': no_decay, 'lr': lr, 'weight_decay': 0.},
-                {'params': decay, 'lr': lr, 'weight_decay': weight_decay},
-                {'params': self.gc1.parameters(), 'lr': lrg},
-                {'params': self.gc2.parameters(), 'lr': lrg},
+                {"params": no_decay, "lr": lr, "weight_decay": 0.0},
+                {"params": decay, "lr": lr, "weight_decay": weight_decay},
+                {"params": self.gc1.parameters(), "lr": lrg},
+                {"params": self.gc2.parameters(), "lr": lrg},
             ]
 
         return [
-            {'params': self.model.parameters(), 'lr': lr},
-            {'params': self.gc1.parameters(), 'lr': lrg},
-            {'params': self.gc2.parameters(), 'lr': lrg},
+            {"params": self.model.parameters(), "lr": lr},
+            {"params": self.gc1.parameters(), "lr": lrg},
+            {"params": self.gc2.parameters(), "lr": lrg},
         ]
 
 
-def resnet(num_classes, arch='resnext50_32x4d_swsl', pretrained=True, model_features=2048):
+def resnet(
+    num_classes, arch="resnext50_32x4d_swsl", pretrained=True, model_features=2048
+):
     model = load_resnet(arch, pretrained=pretrained)
     model = nn.Sequential(
         model.conv1,
@@ -153,12 +173,12 @@ def resnet(num_classes, arch='resnext50_32x4d_swsl', pretrained=True, model_feat
         model.layer3,
         model.layer4,
         nn.MaxPool2d(14, 14),
-        nn.Flatten(1)
+        nn.Flatten(1),
     )
     return Net(model, num_classes, model_features=2048)
 
 
-def vgg(num_classes, arch='vgg16', pretrained=True):
+def vgg(num_classes, arch="vgg16", pretrained=True):
     model = load_vgg(arch, pretrained=pretrained)
     model.classifier = nn.Sequential(
         nn.Linear(512 * 7 * 7, 4096),
@@ -172,24 +192,49 @@ def vgg(num_classes, arch='vgg16', pretrained=True):
     return Net(model, num_classes)
 
 
-def efficientnet(num_classes, arch='efficientnet-b6', pretrained=True):
+def efficientnet(num_classes, arch="efficientnet-b6", pretrained=True):
     from efficientnet_pytorch import EfficientNet
-    model = EfficientNet.from_pretrained(
-        arch, num_classes=num_classes) if pretrained else EfficientNet.from_name(arch, num_classes=num_classes)
+
+    model = (
+        EfficientNet.from_pretrained(arch, num_classes=num_classes)
+        if pretrained
+        else EfficientNet.from_name(arch, num_classes=num_classes)
+    )
     return Net(model, num_classes)
 
 
-def build_net(num_classes, arch='resnext50_32x4d_swsl', pretrained=True, graph=False, gtn=False, t=0.4, adj_files=None, emb_features=300, model_features=2048):
-    if 'vgg' in arch:
-        net = vgg(model_features if graph else num_classes,
-                  arch=arch, pretrained=pretrained)
-    elif 'efficientnet' in arch:
+def build_net(
+    num_classes,
+    arch="resnext50_32x4d_swsl",
+    pretrained=True,
+    graph=False,
+    gtn=False,
+    t=0.4,
+    adj_files=None,
+    emb_features=300,
+    model_features=2048,
+):
+    if "vgg" in arch:
+        net = vgg(
+            model_features if graph else num_classes, arch=arch, pretrained=pretrained
+        )
+    elif "efficientnet" in arch:
         net = efficientnet(
-            model_features if graph else num_classes, arch=arch, pretrained=pretrained)
+            model_features if graph else num_classes, arch=arch, pretrained=pretrained
+        )
     else:
         net = resnet(num_classes, arch=arch, pretrained=pretrained)
 
     if graph:
-        return GraphNet(net.model, num_classes, emb_features=emb_features, gc1_features=model_features//2, gc2_features=model_features, t=t, adj_files=adj_files, gtn=gtn)
+        return GraphNet(
+            net.model,
+            num_classes,
+            emb_features=emb_features,
+            gc1_features=model_features // 2,
+            gc2_features=model_features,
+            t=t,
+            adj_files=adj_files,
+            gtn=gtn,
+        )
     else:
         return net

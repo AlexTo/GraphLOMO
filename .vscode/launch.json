@@ -33,7 +33,7 @@
                 "-a", "resnext50_32x4d_swsl",
                 "-g", "-gtn",
                 "--device_ids", "0", "1",
-                "-n", "resnext50_swsl_gtn"
+                "-n", "resnext50_swsl_gtn_1234432"
             ]
         },
         {

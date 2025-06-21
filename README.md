@@ -51,7 +51,7 @@ python scripts/wsmol_train.py \
     -a resnext50_32x4d_swsl \
     -g -gtn \
     --device_ids 0 1 \
-    -n resnext50_swsl_gtn
+    -n resnext50_swsl_gtn_1234432
 ```
 
 For your convenience, we provided the pretrained models for both MS-COCO and Pascal VOC on [dropbox](https://www.dropbox.com/s/badai7hd5m274mt/checkpoints.zip?dl=0)

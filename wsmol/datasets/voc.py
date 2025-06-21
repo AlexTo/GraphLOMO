@@ -6,17 +6,39 @@ import subprocess
 import os
 import csv
 import torch
+import os.path
+import torch.utils.data as data
+
 from .. import util
 from tqdm import tqdm
 from collections import Counter
 from bs4 import BeautifulSoup
+from PIL import Image
+from pathlib import Path
 
 
-object_categories = ['aeroplane', 'bicycle', 'bird', 'boat',
-                     'bottle', 'bus', 'car', 'cat', 'chair',
-                     'cow', 'diningtable', 'dog', 'horse',
-                     'motorbike', 'person', 'pottedplant',
-                     'sheep', 'sofa', 'train', 'tvmonitor']
+object_categories = [
+    "aeroplane",
+    "bicycle",
+    "bird",
+    "boat",
+    "bottle",
+    "bus",
+    "car",
+    "cat",
+    "chair",
+    "cow",
+    "diningtable",
+    "dog",
+    "horse",
+    "motorbike",
+    "person",
+    "pottedplant",
+    "sheep",
+    "sofa",
+    "train",
+    "tvmonitor",
+]
 
 cats_dict = {c: i for i, c in enumerate(object_categories)}
 
@@ -25,26 +47,43 @@ def load_voc(data_dir):
     return pd.read_csv(data_dir / "files" / "VOC2007" / "classification_train.csv")
 
 
-object_categories = ['aeroplane', 'bicycle', 'bird', 'boat',
-                     'bottle', 'bus', 'car', 'cat', 'chair',
-                     'cow', 'diningtable', 'dog', 'horse',
-                     'motorbike', 'person', 'pottedplant',
-                     'sheep', 'sofa', 'train', 'tvmonitor']
+object_categories = [
+    "aeroplane",
+    "bicycle",
+    "bird",
+    "boat",
+    "bottle",
+    "bus",
+    "car",
+    "cat",
+    "chair",
+    "cow",
+    "diningtable",
+    "dog",
+    "horse",
+    "motorbike",
+    "person",
+    "pottedplant",
+    "sheep",
+    "sofa",
+    "train",
+    "tvmonitor",
+]
 
 urls = {
-    'devkit': 'http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCdevkit_18-May-2011.tar',
-    'trainval_2007': 'http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtrainval_06-Nov-2007.tar',
-    'test_images_2007': 'http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtest_06-Nov-2007.tar',
-    'test_anno_2007': 'http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtestnoimgs_06-Nov-2007.tar',
+    "devkit": "http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCdevkit_18-May-2011.tar",
+    "trainval_2007": "http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtrainval_06-Nov-2007.tar",
+    "test_images_2007": "http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtest_06-Nov-2007.tar",
+    "test_anno_2007": "http://host.robots.ox.ac.uk/pascal/VOC/voc2007/VOCtestnoimgs_06-Nov-2007.tar",
 }
 
 
 def read_image_label(file):
-    print('[dataset] read ' + file)
+    print("[dataset] read " + file)
     data = dict()
-    with open(file, 'r') as f:
+    with open(file, "r") as f:
         for line in f:
-            tmp = line.split(' ')
+            tmp = line.split(" ")
             name = tmp[0]
             label = int(tmp[-1])
             data[name] = label
@@ -54,22 +93,21 @@ def read_image_label(file):
 
 
 def read_object_labels(root, dataset, set):
-    path_labels = os.path.join(root, 'VOCdevkit', dataset, 'ImageSets', 'Main')
+    path_labels = os.path.join(root, "VOCdevkit", dataset, "ImageSets", "Main")
     labeled_data = dict()
     num_classes = len(object_categories)
 
     for i in range(num_classes):
-        file = os.path.join(
-            path_labels, object_categories[i] + '_' + set + '.txt')
+        file = os.path.join(path_labels, object_categories[i] + "_" + set + ".txt")
         data = read_image_label(file)
 
         if i == 0:
-            for (name, label) in data.items():
+            for name, label in data.items():
                 labels = np.zeros(num_classes)
                 labels[i] = label
                 labeled_data[name] = labels
         else:
-            for (name, label) in data.items():
+            for name, label in data.items():
                 labeled_data[name][i] = label
 
     return labeled_data
@@ -77,15 +115,15 @@ def read_object_labels(root, dataset, set):
 
 def write_object_labels_csv(file, labeled_data):
     # write a csv file
-    print('[dataset] write file %s' % file)
-    with open(file, 'w') as csvfile:
-        fieldnames = ['name']
+    print("[dataset] write file %s" % file)
+    with open(file, "w") as csvfile:
+        fieldnames = ["name"]
         fieldnames.extend(object_categories)
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
-        for (name, labels) in labeled_data.items():
-            example = {'name': name}
+        for name, labels in labeled_data.items():
+            example = {"name": name}
             for i in range(20):
                 example[fieldnames[i + 1]] = int(labels[i])
             writer.writerow(example)
@@ -96,8 +134,8 @@ def write_object_labels_csv(file, labeled_data):
 def read_object_labels_csv(file, header=True):
     images = []
     num_categories = 0
-    print('[dataset] read', file)
-    with open(file, 'r') as f:
+    print("[dataset] read", file)
+    with open(file, "r") as f:
         reader = csv.reader(f)
         rownum = 0
         for row in reader:
@@ -107,8 +145,7 @@ def read_object_labels_csv(file, header=True):
                 if num_categories == 0:
                     num_categories = len(row) - 1
                 name = row[0]
-                labels = (np.asarray(
-                    row[1:num_categories + 1])).astype(np.float32)
+                labels = (np.asarray(row[1 : num_categories + 1])).astype(np.float32)
                 labels = torch.from_numpy(labels)
                 item = (name, labels)
                 images.append(item)
@@ -117,86 +154,85 @@ def read_object_labels_csv(file, header=True):
 
 
 def find_images_classification(root, dataset, set):
-    path_labels = os.path.join(root, 'VOCdevkit', dataset, 'ImageSets', 'Main')
+    path_labels = os.path.join(root, "VOCdevkit", dataset, "ImageSets", "Main")
     images = []
-    file = os.path.join(path_labels, set + '.txt')
-    with open(file, 'r') as f:
+    file = os.path.join(path_labels, set + ".txt")
+    with open(file, "r") as f:
         for line in f:
             images.append(line)
     return images
 
 
 def download_voc2007(root):
-    path_devkit = root / 'VOCdevkit'
-    path_images = root / 'VOCdevkit' / 'VOC2007' / 'JPEGImages'
+    path_devkit = root / "VOCdevkit"
+    path_images = root / "VOCdevkit" / "VOC2007" / "JPEGImages"
 
     # create directory
 
     os.makedirs(root, exist_ok=True)
 
     if not os.path.exists(path_devkit):
-        parts = urlparse(urls['devkit'])
+        parts = urlparse(urls["devkit"])
         filename = os.path.basename(parts.path)
         cached_file = root / filename
 
         if not os.path.exists(cached_file):
             print(f"Downloading {urls['devkit']} to {cached_file}")
-            util.download_url(urls['devkit'], cached_file)
+            util.download_url(urls["devkit"], cached_file)
 
         # extract file
-        print(f'Extracting tar file {cached_file} to {root}')
+        print(f"Extracting tar file {cached_file} to {root}")
         subprocess.run(f"tar -xvf {cached_file} -C {root}", shell=True)
 
     # train/val images/annotations
     if not os.path.exists(path_images):
 
         # download train/val images/annotations
-        parts = urlparse(urls['trainval_2007'])
+        parts = urlparse(urls["trainval_2007"])
         filename = os.path.basename(parts.path)
         cached_file = root / filename
 
         if not os.path.exists(cached_file):
             print(f"Downloading {urls['trainval_2007']} to {cached_file}")
-            util.download_url(urls['trainval_2007'], cached_file)
+            util.download_url(urls["trainval_2007"], cached_file)
 
         # extract file
-        print(f'Extracting tar file {cached_file} to {root}')
+        print(f"Extracting tar file {cached_file} to {root}")
         subprocess.run(f"tar -xvf {cached_file} -C {root}", shell=True)
 
     # test annotations
-    test_anno = os.path.join(
-        path_devkit, 'VOC2007/ImageSets/Main/aeroplane_test.txt')
+    test_anno = os.path.join(path_devkit, "VOC2007/ImageSets/Main/aeroplane_test.txt")
     if not os.path.exists(test_anno):
 
         # download test annotations
-        parts = urlparse(urls['test_images_2007'])
+        parts = urlparse(urls["test_images_2007"])
         filename = os.path.basename(parts.path)
         cached_file = root / filename
 
         if not os.path.exists(cached_file):
             print(f"Downloading: {urls['test_images_2007']} to {cached_file}")
-            util.download_url(urls['test_images_2007'], cached_file)
+            util.download_url(urls["test_images_2007"], cached_file)
 
         # extract file
-        print(f'Extracting tar file {cached_file} to {root}')
+        print(f"Extracting tar file {cached_file} to {root}")
         subprocess.run(f"tar -xvf {cached_file} -C {root}", shell=True)
 
     # test images
-    test_image = os.path.join(path_devkit, 'VOC2007/JPEGImages/000001.jpg')
+    test_image = os.path.join(path_devkit, "VOC2007/JPEGImages/000001.jpg")
     if not os.path.exists(test_image):
 
         # download test images
-        parts = urlparse(urls['test_anno_2007'])
+        parts = urlparse(urls["test_anno_2007"])
         filename = os.path.basename(parts.path)
         cached_file = root / filename
 
         if not os.path.exists(cached_file):
             print(f"Downloading: {urls['test_anno_2007']} to {cached_file}")
-            util.download_url(urls['test_anno_2007'], cached_file)
+            util.download_url(urls["test_anno_2007"], cached_file)
 
         # extract file
-        print(f'Extracting tar file {cached_file} to {root}')
-        subprocess.run(f"tar -xvf {cached_file} -C {root}",  shell=True)
+        print(f"Extracting tar file {cached_file} to {root}")
+        subprocess.run(f"tar -xvf {cached_file} -C {root}", shell=True)
 
 
 def gen_metadata(data_dir, metadata_dir):
@@ -214,50 +250,60 @@ def gen_metadata(data_dir, metadata_dir):
     os.makedirs(metadata_dir / "train", exist_ok=True)
     os.makedirs(metadata_dir / "val", exist_ok=True)
 
-    object_categories = ['aeroplane', 'bicycle', 'bird', 'boat',
-                         'bottle', 'bus', 'car', 'cat', 'chair',
-                         'cow', 'diningtable', 'dog', 'horse',
-                         'motorbike', 'person', 'pottedplant',
-                         'sheep', 'sofa', 'train', 'tvmonitor']
+    object_categories = [
+        "aeroplane",
+        "bicycle",
+        "bird",
+        "boat",
+        "bottle",
+        "bus",
+        "car",
+        "cat",
+        "chair",
+        "cow",
+        "diningtable",
+        "dog",
+        "horse",
+        "motorbike",
+        "person",
+        "pottedplant",
+        "sheep",
+        "sofa",
+        "train",
+        "tvmonitor",
+    ]
     cats_dict = {c: i for i, c in enumerate(object_categories)}
 
     for phase in phases:
 
         df = pd.read_csv(data_dir / "files" / "VOC2007" / f"classification_{phase}.csv")
-        file_list = [str(f).zfill(6) for f in df['name'].values]
+        file_list = [str(f).zfill(6) for f in df["name"].values]
 
-        try:
-            image_ids_file = open(metadata_dir / f"{phase}/image_ids.txt", 'w')
-            class_labels_file = open(
-                metadata_dir / f"{phase}/class_labels.txt", 'w')
-            image_sizes_file = open(
-                metadata_dir / f"{phase}/image_sizes.txt", 'w')
-            localization_file = open(
-                metadata_dir / f"{phase}/localization.txt", 'w')
-
+        with open(metadata_dir / f"{phase}/image_ids.txt", "w") as image_ids_file, open(
+            metadata_dir / f"{phase}/class_labels.txt", "w"
+        ) as class_labels_file, open(
+            metadata_dir / f"{phase}/image_sizes.txt", "w"
+        ) as image_sizes_file, open(
+            metadata_dir / f"{phase}/localization.txt", "w"
+        ) as localization_file:
             for i, f in tqdm(enumerate(file_list)):
                 img_id = f"VOCdevkit/VOC2007/JPEGImages/{f}.jpg"
                 image_ids_file.write(f"{img_id}\n")
                 labels = np.where(df.iloc[i, 1:] >= 0)[0]
-                class_labels_file.write(
-                    f"{img_id},{','.join(map(str, labels))}\n")
+                class_labels_file.write(f"{img_id},{','.join(map(str, labels))}\n")
 
                 with open(data_dir / f"VOCdevkit/VOC2007/Annotations/{f}.xml") as f:
                     img_metadata = BeautifulSoup(f, features="lxml")
 
                 image_sizes_file.write(
-                    f"{img_id},{img_metadata.size.width.text},{img_metadata.size.height.text}\n")
+                    f"{img_id},{img_metadata.size.width.text},{img_metadata.size.height.text}\n"
+                )
                 objects = img_metadata.find_all("object")
                 for o in objects:
                     bbox_label = cats_dict[o.find("name").text]
                     localization_file.write(
-                        f"{img_id},{bbox_label},{o.find('xmin').text},{o.find('ymin').text},{o.find('xmax').text},{o.find('ymax').text}\n")
-
-        finally:
-            image_ids_file.close()
-            class_labels_file.close()
-            image_sizes_file.close()
-            localization_file.close()
+                        f"{img_id},{bbox_label},{o.find('xmin').text},{o.find('ymin').text},{o.find('xmax').text},{o.find('ymax').text}\n"
+                    )
 
 
 def adj_by_count(data_dir, metadata_dir):
@@ -271,13 +317,13 @@ def adj_by_count(data_dir, metadata_dir):
         for i in range(n):
             if onehot[i] >= 0:
                 nums[i] += 1
-                for j in range(i+1, n):
+                for j in range(i + 1, n):
                     if onehot[j] >= 0:
                         adj[i][j] += 1
                         adj[j][i] += 1
 
-    result = {'nums': nums, 'adj': adj}
-    with open(metadata_dir / "topology" / f"voc_adj.pkl", 'wb') as f:
+    result = {"nums": nums, "adj": adj}
+    with open(metadata_dir / "topology" / f"voc_adj.pkl", "wb") as f:
         pickle.dump(result, f)
 
 
@@ -291,12 +337,14 @@ def adj_x_y(data_dir, metadata_dir, cof_x, cof_y):
         img_name = f"{str(row.values[0]).zfill(6)}.xml"
         labels0 = [i for i, v in enumerate(row.values[1:]) if v >= 0]
         img_xml = BeautifulSoup(
-            open(data_dir / "VOCdevkit" / "VOC2007" / "Annotations" / img_name).read(), features="lxml")
+            open(data_dir / "VOCdevkit" / "VOC2007" / "Annotations" / img_name).read(),
+            features="lxml",
+        )
         objects = img_xml.findAll("object")
 
         labels = [cats_dict[o.find("name").text] for o in objects]
 
-        assert(sorted(labels0) == sorted(set(labels)))
+        assert sorted(labels0) == sorted(set(labels))
 
         label_count = Counter(labels)
         labels = list(label_count.keys())
@@ -305,7 +353,7 @@ def adj_x_y(data_dir, metadata_dir, cof_x, cof_y):
             for i in range(n):
                 if label_count[labels[i]] >= cof_x:
                     nums[labels[i]] += 1
-                for j in range(i+1, n):
+                for j in range(i + 1, n):
                     x = labels[i]
                     y = labels[j]
                     if label_count[x] >= cof_x and label_count[y] >= cof_y:
@@ -314,9 +362,9 @@ def adj_x_y(data_dir, metadata_dir, cof_x, cof_y):
                     if label_count[y] >= cof_x and label_count[x] >= cof_y:
                         adj[y][x] += 1
 
-    result = {'nums': nums, 'adj': adj}
+    result = {"nums": nums, "adj": adj}
 
-    with open(metadata_dir / "topology" / f"voc_adj_{cof_x}_{cof_y}.pkl", 'wb') as f:
+    with open(metadata_dir / "topology" / f"voc_adj_{cof_x}_{cof_y}.pkl", "wb") as f:
         pickle.dump(result, f)
 
 
@@ -329,7 +377,9 @@ def adj_x_dot_y(data_dir, metadata_dir, cof_x, cof_y):
     for i, row in tqdm(classif_train.iterrows()):
         img_name = f"{str(row.values[0]).zfill(6)}.xml"
         img_xml = BeautifulSoup(
-            open(data_dir / "VOCdevkit" / "VOC2007" / "Annotations", img_name).read(), features="lxml")
+            open(data_dir / "VOCdevkit" / "VOC2007" / "Annotations", img_name).read(),
+            features="lxml",
+        )
         objects = img_xml.findAll("object")
 
         labels = [cats_dict[o.find("name").text] for o in objects]
@@ -341,7 +391,7 @@ def adj_x_dot_y(data_dir, metadata_dir, cof_x, cof_y):
             for i in range(n):
                 if label_count[labels[i]] / cof_x >= 1:
                     nums[labels[i]] += 1
-                for j in range(i+1, n):
+                for j in range(i + 1, n):
                     x = labels[i]
                     y = labels[j]
                     if label_count[x] * cof_x >= label_count[y] * cof_y:
@@ -350,6 +400,77 @@ def adj_x_dot_y(data_dir, metadata_dir, cof_x, cof_y):
                     if label_count[y] * cof_x >= label_count[x] * cof_y:
                         adj[y][x] += 1
 
-    result = {'nums': nums, 'adj': adj}
-    with open(metadata_dir / "topology" / f"voc_adj_{cof_x}.{cof_y}.pkl", 'wb') as f:
+    result = {"nums": nums, "adj": adj}
+    with open(metadata_dir / "topology" / f"voc_adj_{cof_x}.{cof_y}.pkl", "wb") as f:
         pickle.dump(result, f)
+
+
+class Voc2007Classification(data.Dataset):
+    def __init__(
+        self,
+        data_dir="dataset/voc",
+        metadata_dir="metadata/voc",
+        phase="train",
+        transform=None,
+        target_transform=None,
+        emb_name=None,
+    ):
+        if isinstance(data_dir, str):
+            data_dir = Path(data_dir)
+
+        if isinstance(metadata_dir, str):
+            metadata_dir = Path(metadata_dir)
+
+        self.data_dir = data_dir
+        self.metadata_dir = metadata_dir
+
+        self.path_devkit = data_dir / "VOCdevkit"
+        self.path_images = data_dir / "VOCdevkit" / "VOC2007" / "JPEGImages"
+        self.set = phase
+        self.transform = transform
+        self.target_transform = target_transform
+
+        # download dataset
+        download_voc2007(self.data_dir)
+
+        gen_metadata(self.data_dir, self.metadata_dir)
+
+        # define path of csv file
+        path_csv = self.data_dir / "files" / "VOC2007"
+        # define filename of csv file
+        file_csv = path_csv / f"classification_{phase}.csv"
+
+        # create the csv file if necessary
+        if not os.path.exists(file_csv):
+            os.makedirs(path_csv, exist_ok=True)
+            # generate csv file
+            labeled_data = read_object_labels(self.data_dir, "VOC2007", self.set)
+            # write csv file
+            write_object_labels_csv(file_csv, labeled_data)
+
+        self.classes = object_categories
+        self.images = read_object_labels_csv(file_csv)
+
+        with open(emb_name, "rb") as f:
+            self.emb = pickle.load(f)
+        self.emb_name = emb_name
+
+        print(
+            f"VOC 2007 classification set={phase} number of classes={len(self.classes)}  number of images=len(self.images)"
+        )
+
+    def __getitem__(self, index):
+        path, target = self.images[index]
+        img = Image.open(os.path.join(self.path_images, path + ".jpg")).convert("RGB")
+        if self.transform is not None:
+            img = self.transform(img)
+        if self.target_transform is not None:
+            target = self.target_transform(target)
+
+        return (img, path, self.emb), target
+
+    def __len__(self):
+        return len(self.images)
+
+    def get_number_classes(self):
+        return len(self.classes)

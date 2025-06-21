@@ -3,10 +3,14 @@ import pickle
 import os
 import subprocess
 import json
-
+import torch.utils.data as data
 from tqdm import tqdm
 from collections import Counter
 from pycocotools.coco import COCO
+
+from PIL import Image
+from pathlib import Path
+
 
 urls = {
     "train_img": "http://images.cocodataset.org/zips/train2014.zip",
@@ -73,9 +77,11 @@ def download_coco2014(data_dir, phase):
         anno_list = []
         for _, v in img_id.items():
             anno_list.append(v)
-        json.dump(anno_list, open(anno, "w"))
+        with open(anno, "w") as f:
+            json.dump(anno_list, f)
         if not os.path.exists(data_dir / "category.json"):
-            json.dump(cat2idx, open(data_dir / "category.json", "w"))
+            with open(data_dir / "category.json", "w") as f:
+                json.dump(cat2idx, f)
 
 
 def categoty_to_idx(category):
@@ -116,7 +122,9 @@ def adj_by_count(data_dir, metadata_dir):
                     adj[labels[j]][labels[i]] += 1
 
     result = {"nums": nums, "adj": adj}
-    pickle.dump(result, open(metadata_dir / "topology" / f"coco_adj.pkl", "wb"))
+
+    with open(metadata_dir / "topology" / f"coco_adj.pkl", "wb") as f:
+        pickle.dump(result, f)
 
 
 def adj_x_y(data_dir, metadata_dir, cof_x, cof_y):
@@ -145,9 +153,8 @@ def adj_x_y(data_dir, metadata_dir, cof_x, cof_y):
                         adj[y][x] += 1
 
     result = {"nums": nums, "adj": adj}
-    pickle.dump(
-        result, open(metadata_dir / "topology" / f"coco_adj_{cof_x}_{cof_y}.pkl", "wb")
-    )
+    with open(metadata_dir / "topology" / f"coco_adj_{cof_x}_{cof_y}.pkl", "wb") as f:
+        pickle.dump(result, f)
 
 
 def adj_x_dot_y(data_dir, metadata_dir, cof_x, cof_y):
@@ -176,9 +183,9 @@ def adj_x_dot_y(data_dir, metadata_dir, cof_x, cof_y):
                         adj[y][x] += 1
 
     result = {"nums": nums, "adj": adj}
-    pickle.dump(
-        result, open(metadata_dir / "topology" / f"coco_adj_{cof_x}.{cof_y}.pkl", "wb")
-    )
+
+    with open(metadata_dir / "topology" / f"coco_adj_{cof_x}_{cof_y}.pkl", "wb") as f:
+        pickle.dump(result, f)
 
 
 def gen_metadata(data_dir, metadata_dir):
@@ -237,15 +244,15 @@ def gen_metadata(data_dir, metadata_dir):
                 )  # convert to x0, y0, x1, y1 format
                 image_sizes.append([img["width"], img["height"]])
 
-            try:
-                image_ids_file = open(metadata_dir / f"{phase}/image_ids.txt", "w")
-                class_labels_file = open(
-                    metadata_dir / f"{phase}/class_labels.txt", "w"
-                )
-                image_sizes_file = open(metadata_dir / f"{phase}/image_sizes.txt", "w")
-                localization_file = open(
-                    metadata_dir / f"{phase}/localization.txt", "w"
-                )
+            with open(
+                metadata_dir / f"{phase}/image_ids.txt", "w"
+            ) as image_ids_file, open(
+                metadata_dir / f"{phase}/image_sizes.txt", "w"
+            ) as image_sizes_file, open(
+                metadata_dir / f"{phase}/class_labels.txt", "w"
+            ) as class_labels_file, open(
+                metadata_dir / f"{phase}/localization.txt", "w"
+            ) as localization_file:
 
                 for i in range(len(image_ids)):
                     img_id = image_ids[i]
@@ -266,8 +273,50 @@ def gen_metadata(data_dir, metadata_dir):
                             f"{phase}2014/{img_id},{bbox_label},{','.join(map(str, bbox))}\n"
                         )
 
-            finally:
-                image_ids_file.close()
-                class_labels_file.close()
-                image_sizes_file.close()
-                localization_file.close()
+
+class COCO2014(data.Dataset):
+    def __init__(
+        self,
+        data_dir="data/coco",
+        metadata_dir="metadata/coco",
+        transform=None,
+        phase="train",
+        emb_name=None,
+    ):
+        if isinstance(data_dir, str):
+            data_dir = Path(data_dir)
+
+        if isinstance(metadata_dir, str):
+            metadata_dir = Path(metadata_dir)
+
+        self.data_dir = data_dir
+        self.phase = phase
+        self.img_list = []
+        self.transform = transform
+        download_coco2014(data_dir, phase)
+        gen_metadata(data_dir, metadata_dir)
+        self.get_anno()
+        self.num_classes = len(self.cat2idx)
+        with open(emb_name, "rb") as f:
+            self.emb = pickle.load(f)
+        self.emb_name = emb_name
+
+    def get_anno(self):
+        list_path = self.data_dir / f"{self.phase}_anno.json"
+        self.img_list = json.load(open(list_path, "r"))
+        self.cat2idx = json.load(open(self.data_dir / "category.json", "r"))
+
+    def __len__(self):
+        return len(self.img_list)
+
+    def __getitem__(self, index):
+        item = self.img_list[index]
+        filename = item["file_name"]
+        labels = sorted(item["labels"])
+        img_path = self.data_dir / f"{self.phase}2014" / filename
+        img = Image.open(img_path).convert("RGB")
+        if self.transform is not None:
+            img = self.transform(img)
+        target = np.zeros(self.num_classes, np.float32) - 1
+        target[labels] = 1
+        return (img, filename, self.emb), target
